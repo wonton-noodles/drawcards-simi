@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>侧影抽卡模拟器（渡见春版）</title>
+    <style>
+        /* 基本背景和文字颜色 */
+        body {
+            background-color: #35373F; /* 深灰色背景 */
+            color: #e0e0e0; /* 浅灰色文字 */
+            font-family: Arial, sans-serif; /* 设置默认字体 */
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .container {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .container {
+                width: 90%;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .container {
+                width: 80%;
+            }
+        }
+
+        #drawButton {
+            display: block;
+            margin: 20px auto;
+            background-color: #E9547C;
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        #drawButton:hover {
+            background-color: #FE9900;
+        }
+
+        a {
+            color: #bb86fc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+       .stats-row, .special-stats-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px; /* 减少了每行之间的外边距 */
+}
+
+.stats-row p, .special-stats-row p {
+    flex: 1;
+    margin: 0 5px; /* 减少了段落之间的外边距，使内容更紧凑 */
+    padding: 5px; /* 内边距减少 */
+    font-size: 14px; /* 字体大小适当调整 */
+    line-height: 1.4; /* 行高调整 */
+    background-color: #40424a; /* 给统计数据添加背景色以增强区分度 */
+    border-radius: 5px; /* 轻微圆角效果 */
+    text-align: center; /* 文字居中显示 */
+}
+
+/* 特殊统计行的样式 */
+.special-stats-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px; /* 减少了每行之间的外边距 */
+}
+
+.special-stats-row p {
+    flex: 1;
+    margin: 0 5px; /* 减少了段落之间的外边距，使内容更紧凑 */
+    padding: 5px; /* 内边距减少 */
+    font-size: 14px; /* 字体大小适当调整 */
+    line-height: 1.4; /* 行高调整 */
+    background-color: #40424a; /* 给统计数据添加背景色以增强区分度 */
+    border-radius: 5px; /* 轻微圆角效果 */
+    text-align: center; /* 文字居中显示 */
+}
+
+/* 世界侧影累计数的颜色 */
+.world-color {
+    color: #FFA500; /* 橙色 */
+}
+
+/* 月侧影累计数的颜色 */
+.moon-color {
+    color: #BBA0E3; /* 淡紫色 */
+}
+
+/* 星侧影累计数的颜色 */
+.star-color {
+    color: #00BFFF; /* 青蓝色 */
+}
+
+/* 高亮显示世界卡牌 */
+.world-card-highlight {
+    color: #FFA500; /* 橙色 */
+    font-weight: bold; /* 加粗 */
+}
+
+      .info-icon {
+    cursor: help;
+    font-size: 16px; /* 或者任何适合你设计的大小 */
+    margin-left: 5px; /* 添加一点左边距以与前面的文字分开 */
+}
+      #refreshButton {
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    cursor: pointer;
+    font-size: 20px; /* 调整大小以适应 */
+}
+
+      .special-world-card-highlight {
+    color: #ffff66; /* 橙黄色 */
+    font-weight: bold; /* 可选的，如果你想要文字加粗 */
+}
+
+    </style>
+</head>
+<body>
+    <h2 class="text-center">侧影抽卡模拟器（渡见春版）</h2>
+    <h3 class="text-center">
+      仅供娱乐，祝大家欧气满满ᕙ(`▿´)ᕗ
+    <span class="info-icon" title="这是一个模拟游戏，结果并不真实">ℹ️</span>
+    </h3>
+    <button id="drawButton">10连一发入魂</button>
+    <div id="statistics" class="text-center">
+        <h3>统计数据</h3>
+        <div class="stats-row">
+            <p>总抽数：<span id="totalDraws">0</span></p>
+            <p><span class="world-color">世界侧影累计：</span><span id="worldCards" class="world-color">0</span></p>
+          
+        </div>
+        <div class="stats-row">
+            <p><span class="moon-color">月侧影累计：</span><span id="moonCards" class="moon-color">0</span></p>
+            <p><span class="star-color">星侧影累计：</span><span id="starCards" class="star-color">0</span></p>
+        </div>
+        <h3>限定侧影统计数据（开始抽卡后显示）</h3>
+        <div id="specialCardsStats" class="special-stats-container"></div>
+    </div>
+    <!-- 添加了抽卡历史记录的元素 -->
+    <h3 class="text-center">历史记录 <button id="refreshButton" title=点我重开>🔄</button></h3>
+    <ul id="cardHistory" class="text-center"></ul>
+    <script>
+    const worldCardNames = [
+'长梦将醒', '许你长安', '可望不可及', '逢魔', '存在与消弭', '凝海成冰', '那夜风轻', '临别', '花好月圆', '加冕时刻', '待你归来', '不欢更何待', '妄念', '雨中暂别', '午夜已至', '心行千万里', '不觉日长', '冰海', '风雪归人', '夜霜侵怀', '遥路生花', '因缘何错', '知我暗涌', '慈悲不渡'
+];
+const specialWorldCards = ['遥路生花', '因缘何错', '知我暗涌', '慈悲不渡'];
+let recentCards = [], totalDraws = 0, stats = { world: 0, moon: 0, star: 0, special: {} };
+
+specialWorldCards.forEach(card => stats.special[card] = 0);
+
+document.getElementById('drawButton').addEventListener('click', function() {
+let cardsDrawn = drawCards();
+updateHistory(cardsDrawn);
+updateStatistics();
+});
+      
+function drawCards() {
+    let cardsDrawn = [], worldDrawn = false, moonDrawn = false;
+    let guaranteeDrawIndex = Math.floor(Math.random() * 10); // 在10连中随机选择一次作为保底抽取
+    let hasWorldInLast60 = recentCards.slice(-60).some(card => card.includes("世界"));
+    let is70thDraw = ((totalDraws + 10) % 70 === 0); // 检查是否是第70次抽取
+
+    for (let i = 0; i < 10; i++) {
+        let card;
+        if ((i === guaranteeDrawIndex && !hasWorldInLast60 && totalDraws >= 60) || (is70thDraw && !worldDrawn && i === 9)) {
+            // 连续60次没有抽到或者第70次抽取时保底出世界卡
+            card = drawWorldCard();
+            worldDrawn = true;
+        } else if (i === guaranteeDrawIndex && !worldDrawn) {
+            // 保底逻辑，根据98%的概率抽取月卡，2%的概率抽取世界卡
+            card = Math.random() < 0.02 ? drawWorldCard() : drawMoonCard();
+            if (card.includes("世界")) worldDrawn = true;
+            else moonDrawn = true;
+        } else {
+            card = drawRandomCard();
+            if (card.includes("世界")) worldDrawn = true;
+            else if (card.includes("月")) moonDrawn = true;
+        }
+
+        cardsDrawn.push(card);
+    }
+
+    // 更新抽卡记录
+    recentCards.push(...cardsDrawn);
+    // 保持recentCards仅记录最近60次抽卡结果
+    if (recentCards.length > 60) recentCards = recentCards.slice(-60);
+    totalDraws += 10;
+
+// 特殊情况：仅在第100次抽取时，添加一个额外的限定世界卡
+if (totalDraws === 100) {
+    let specialCard = drawSpecialWorldCard();
+    cardsDrawn.push(specialCard); // 添加到抽卡结果中
+}
+
+    // 返回本次抽卡结果
+    return cardsDrawn;
+}
+
+
+
+function drawRandomCard() {
+let rand = Math.random();
+if (rand < 0.02) return drawWorldCard();
+else if (rand < 0.12) return drawMoonCard();
+else return drawStarCard();
+}
+
+function drawSpecialCard(guaranteeWorld) {
+return guaranteeWorld ? drawWorldCard() : (Math.random() < 0.02 ? drawWorldCard() : drawMoonCard());
+}
+
+let lastWorldCardSpecial = false; // 追踪上一次是否抽到限定世界卡
+
+function drawWorldCard() {
+    let cardName, isSpecial;
+    // 首次抽卡时，让限定与非限定世界卡的机会均等
+    let firstTimeWorldDraw = totalDraws === 0; // 判断是否为首次抽世界卡
+
+    let drawProbability = totalDraws <= 160 ? 0.5 : (totalDraws <= 260 ? 0.6 : (totalDraws <= 360 ? 0.75 : 1));
+
+    if (firstTimeWorldDraw) {
+        // 如果是第一次抽取世界卡，限定与非限定的概率是50-50
+        isSpecial = Math.random() < 0.5;
+    } else if (!lastWorldCardSpecial || Math.random() < drawProbability) {
+        // 如果之前没有抽到限定世界卡或根据概率计算应该抽到限定卡
+        isSpecial = true;
+    } else {
+        // 否则，这次不抽取限定世界卡
+        isSpecial = false;
+    }
+
+    if (isSpecial) {
+        cardName = specialWorldCards[Math.floor(Math.random() * specialWorldCards.length)];
+    } else {
+        let nonSpecialWorldCards = worldCardNames.filter(name => !specialWorldCards.includes(name));
+        cardName = nonSpecialWorldCards[Math.floor(Math.random() * nonSpecialWorldCards.length)];
+    }
+
+    let card = `世界（${cardName}）`;
+    stats.world++;
+    if (isSpecial) {
+        stats.special[cardName] = (stats.special[cardName] || 0) + 1;
+        lastWorldCardSpecial = true;
+    } else {
+        lastWorldCardSpecial = false;
+    }
+
+    return card;
+}
+
+
+
+function drawMoonCard() {
+stats.moon++;
+return "月";
+}
+
+function drawStarCard() {
+stats.star++;
+return "星";
+}
+      
+      function drawSpecialWorldCard() {
+    let cardName = specialWorldCards[Math.floor(Math.random() * specialWorldCards.length)];
+    let card = `世界（${cardName}）`;
+    stats.world++;
+    stats.special[cardName] = (stats.special[cardName] || 0) + 1;
+    return card;
+}
+
+
+function updateHistory(cards) {
+    let historyElement = document.getElementById('cardHistory');
+    let listItem = document.createElement('li');
+    let batchNumber = totalDraws / 10;
+    listItem.innerHTML = `${batchNumber} - 抽到：` + cards.map((card, index) => {
+        let isSpecialWorldCard = index === 10; // 检查是否为额外的限定卡
+        if (card.includes("世界")) {
+            return `<span class="${isSpecialWorldCard ? 'special-world-card-highlight' : 'world-card-highlight'}">${card}</span>`;
+        } else {
+            return card;
+        }
+    }).join(', ');
+    historyElement.appendChild(listItem);
+}
+
+
+
+function updateStatistics() {
+document.getElementById('totalDraws').textContent = totalDraws;
+document.getElementById('worldCards').textContent = stats.world;
+document.getElementById('moonCards').textContent = stats.moon;
+document.getElementById('starCards').textContent = stats.star;
+
+// 更新限定侧影统计数据
+updateSpecialStats(); // 确保这行代码被添加
+}
+
+function updateSpecialStats() {
+let specialStatsElement = document.getElementById('specialCardsStats');
+specialStatsElement.innerHTML = ''; // 清空现有统计数据
+let entries = Object.keys(stats.special);
+for (let i = 0; i < entries.length; i += 2) {
+let row = document.createElement('div');
+row.className = 'special-stats-row';
+
+let entry1 = document.createElement('p');
+entry1.textContent = `${entries[i]}累计：${stats.special[entries[i]]}`;
+row.appendChild(entry1);
+
+if (i + 1 < entries.length) {
+let entry2 = document.createElement('p');
+entry2.textContent = `${entries[i + 1]}累计：${stats.special[entries[i + 1]]}`;
+row.appendChild(entry2);
+}
+
+specialStatsElement.appendChild(row);
+}
+}
+      document.getElementById('refreshButton').addEventListener('click', function() {
+  location.reload();
+});
+
+function drawExtraSpecialWorldCard() {
+    let cardName = specialWorldCards[Math.floor(Math.random() * specialWorldCards.length)];
+    let card = `世界（${cardName}）`;
+    stats.world++;
+    stats.special[cardName] = (stats.special[cardName] || 0) + 1;
+    return card;
+}
+
+    </script>
+</body>
+</html>
